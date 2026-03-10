@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedivineHealth – Your AI Health Companion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cyan:        #10B981;
+      --cyan-dark:   #047857;
+      --cyan-light:  #DCFCE7;
+      --blue:        #0891B2;
+      --blue-light:  #E0F7FA;
+      --indigo:      #059669;
+      --glow-cyan:   rgba(16,185,129,0.28);
+      --glow-blue:   rgba(8,145,178,0.18);
+      --text:        #052E16;
+      --muted:       #4B7A6A;
+      --light:       #F0FDF4;
+      --white:       #FFFFFF;
+      --border:      rgba(16,185,129,0.2);
+      --card-shadow: 0 4px 24px rgba(5,46,22,0.08);
+      --card-hover:  0 16px 48px rgba(16,185,129,0.18), 0 4px 16px rgba(5,46,22,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--white);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ═══ NAV ═══ */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 300;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 5%;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(16,185,129,0.15);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 4px 30px rgba(16,185,129,0.1); }
+
+    .logo {
+      display: flex; align-items: center; gap: 0.65rem;
+      text-decoration: none; font-weight: 900; font-size: 1.3rem;
+      color: var(--text); letter-spacing: -0.02em;
+    }
+    .logo-mark {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, #10B981, #0891B2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 14px var(--glow-cyan);
+    }
+    .logo em { font-style: normal; color: var(--cyan-dark); }
+
+    .nav-links { list-style: none; display: flex; align-items: center; gap: 2rem; }
+    .nav-links a {
+      text-decoration: none; font-size: 0.88rem; font-weight: 600;
+      color: var(--muted); transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: linear-gradient(135deg, #10B981, #0891B2) !important;
+      color: var(--white) !important;
+      padding: 0.6rem 1.4rem !important; border-radius: 100px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 18px var(--glow-cyan) !important;
+      transition: all 0.25s !important;
+    }
+    .nav-cta:hover { transform: translateY(-1px) !important; box-shadow: 0 8px 28px var(--glow-cyan) !important; }
+
+    .hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
+
+    /* ═══ HERO ═══ */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 8rem 5% 5rem;
+      position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #F0FDF4 0%, #FFFFFF 50%, #F0FDFA 100%);
+    }
+
+    /* Futuristic grid lines */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(16,185,129,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .glow-orb {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      animation: orb-pulse 6s ease-in-out infinite;
+    }
+    .go-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(16,185,129,0.13) 0%, transparent 70%);
+      top: -150px; right: -100px;
+    }
+    .go-2 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(8,145,178,0.1) 0%, transparent 70%);
+      bottom: -80px; left: -80px;
+      animation-delay: -3s;
+    }
+    @keyframes orb-pulse {
+      0%,100% { transform: scale(1); opacity: 0.8; }
+      50%      { transform: scale(1.08); opacity: 1; }
+    }
+
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center; position: relative; z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--cyan-light);
+      border: 1px solid rgba(16,185,129,0.35);
+      padding: 0.45rem 1rem; border-radius: 100px;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--cyan-dark); margin-bottom: 1.5rem;
+      animation: fadeUp 0.7s ease both;
+    }
+    .badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.5);
+      animation: ping 1.5s ease infinite;
+    }
+    @keyframes ping {
+      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+      70%  { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.03em; color: var(--text);
+      margin-bottom: 1.4rem;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(90deg, #10B981, #34D399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem; font-weight: 500;
+      color: var(--muted); line-height: 1.75;
+      margin-bottom: 2.2rem; max-width: 480px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-btns {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #10B981, #0891B2);
+      color: var(--white); padding: 0.9rem 2rem;
+      border-radius: 100px; font-weight: 800; font-size: 0.95rem;
+      text-decoration: none;
+      box-shadow: 0 8px 28px var(--glow-cyan);
+      transition: all 0.25s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px var(--glow-cyan); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--text); font-weight: 700; font-size: 0.95rem;
+      text-decoration: none; padding: 0.9rem 1.6rem;
+      border-radius: 100px;
+      border: 2px solid rgba(16,185,129,0.3);
+      transition: all 0.25s; background: rgba(16,185,129,0.04);
+    }
+    .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan-dark); transform: translateY(-2px); }
+
+    /* Hero phone */
+    .hero-visual { position: relative; animation: fadeUp 0.7s 0.25s ease both; }
+
+    .hero-phone {
+      max-width: 310px; margin: 0 auto;
+      background: linear-gradient(160deg, #0A1628, #0F2354);
+      border-radius: 32px; padding: 1.8rem 1.5rem;
+      box-shadow: 0 24px 80px rgba(16,185,129,0.2), 0 0 0 1px rgba(16,185,129,0.15);
+      position: relative; z-index: 2;
+    }
+    .phone-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.4rem;
+    }
+    .phone-logo-txt { font-weight: 900; font-size: 0.88rem; color: white; }
+    .phone-logo-txt em { font-style: normal; color: var(--cyan); }
+    .phone-av {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, #10B981, #0891B2);
+      display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+      box-shadow: 0 0 12px var(--glow-cyan);
+    }
+
+    .chat { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.1rem; }
+    .bubble {
+      padding: 0.7rem 0.95rem; border-radius: 16px;
+      font-size: 0.79rem; line-height: 1.45; max-width: 88%;
+    }
+    .b-user {
+      background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.82);
+      align-self: flex-end; border-bottom-right-radius: 5px;
+    }
+    .b-ai {
+      background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(8,145,178,0.15));
+      border: 1px solid rgba(16,185,129,0.3); color: white;
+      align-self: flex-start; border-bottom-left-radius: 5px;
+    }
+    .b-ai strong { color: var(--cyan); display: block; font-size: 0.7rem; margin-bottom: 0.2rem; }
+
+    .risk-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0.85rem; }
+    .risk-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-bottom: 0.5rem; }
+    .risk-row span:last-child { color: var(--cyan); font-weight: 800; }
+    .risk-track { height: 5px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
+    .risk-fill { height: 100%; width: 18%; border-radius: 100px; background: linear-gradient(90deg, #10B981, #34D399); animation: grow 1.8s 1s ease both; }
+    @keyframes grow { from { width: 0; } }
+
+    .float-chip {
+      position: absolute; z-index: 3;
+      background: var(--white); border-radius: 14px;
+      padding: 0.7rem 1rem;
+      box-shadow: 0 8px 32px rgba(16,185,129,0.18), 0 2px 8px rgba(15,27,45,0.08);
+      display: flex; align-items: center; gap: 0.65rem;
+      font-size: 0.77rem; font-weight: 700; color: var(--text);
+      border: 1px solid rgba(16,185,129,0.15);
+    }
+    .chip-ico { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
+    .chip-sub { font-size: 0.67rem; color: var(--muted); font-weight: 500; display: block; }
+    .fc-a { top: -18px; left: -50px; animation: flt 3.5s ease-in-out infinite; }
+    .fc-b { bottom: 20px; right: -45px; animation: flt 3.5s 1.7s ease-in-out infinite; }
+    @keyframes flt { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    /* ═══ TRUST ═══ */
+    .trust {
+      padding: 2rem 5%;
+      background: var(--light);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .trust-row {
+      max-width: 1000px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 1.8rem 3.5rem; align-items: center;
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.83rem; font-weight: 700; color: var(--muted);
+    }
+
+    /* ═══ FEATURES ═══ */
+    .features { padding: 7rem 5%; background: var(--white); }
+
+    .sec-head { text-align: center; max-width: 640px; margin: 0 auto 4.5rem; }
+    .sec-tag {
+      display: inline-block; font-size: 0.74rem; font-weight: 800;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--cyan-dark); margin-bottom: 1rem;
+    }
+    .sec-head h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      line-height: 1.1; color: var(--text); margin-bottom: 1rem;
+    }
+    .sec-head h2 .grad {
+      background: linear-gradient(90deg, #10B981, #34D399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sec-head p { color: var(--muted); font-size: 1rem; line-height: 1.7; font-weight: 500; }
+
+    .feat-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem;
+    }
+
+    .feat {
+      background: var(--white);
+      border: 1.5px solid rgba(16,185,129,0.14);
+      border-radius: 22px; padding: 1.8rem 1.6rem;
+      transition: all 0.3s; position: relative; overflow: hidden; cursor: default;
+      display: flex; flex-direction: column;
+    }
+    .feat::before {
+      content: ''; position: absolute; inset: 0; border-radius: 22px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(8,145,178,0.04));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feat:hover {
+      transform: translateY(-5px);
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: var(--card-hover);
+    }
+    .feat:hover::before { opacity: 1; }
+    .feat.wide { grid-column: span 2; }
+
+    .feat-ico {
+      width: 52px; height: 52px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1.1rem;
+      position: relative; z-index: 1;
+    }
+    .feat-n {
+      position: absolute; top: 1.2rem; right: 1.4rem;
+      font-size: 0.7rem; font-weight: 800; color: var(--cyan);
+      opacity: 0.35; font-family: 'Space Grotesk', sans-serif;
+    }
+    .feat h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--text);
+      margin-bottom: 0.5rem; line-height: 1.3;
+      position: relative; z-index: 1;
+    }
+    .feat p {
+      font-size: 0.85rem; color: var(--muted); line-height: 1.65; font-weight: 500;
+      position: relative; z-index: 1; flex: 1;
+    }
+    .feat-arrow {
+      display: flex; align-items: center; justify-content: flex-end;
+      margin-top: 1.2rem; position: relative; z-index: 1;
+    }
+    .feat-arrow span {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--cyan-light);
+      border: 1.5px solid rgba(16,185,129,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; color: var(--cyan-dark);
+      transition: all 0.25s;
+    }
+    .feat:hover .feat-arrow span {
+      background: linear-gradient(135deg, #10B981, #0891B2);
+      color: white;
+      border-color: transparent;
+      transform: translateX(3px);
+      box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+    }
+    .feat-pill {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      margin-bottom: 1rem; font-size: 0.71rem; font-weight: 800;
+      color: var(--cyan-dark); background: var(--cyan-light);
+      padding: 0.28rem 0.7rem; border-radius: 100px;
+      position: relative; z-index: 1; letter-spacing: 0.01em;
+    }
+
+    .ic-cyan   { background: #E0F9FC; }
+    .ic-blue   { background: #EFF6FF; }
+    .ic-indigo { background: #EEF2FF; }
+    .ic-violet { background: #F5F3FF; }
+    .ic-amber  { background: #FFFBEB; }
+    .ic-rose   { background: #FFF1F2; }
+    .ic-fuchsia{ background: #FDF4FF; }
+    .ic-teal   { background: #F0FDFA; }
+
+    /* ═══ HOW IT WORKS ═══ */
+    .how {
+      padding: 7rem 5%;
+      background: linear-gradient(160deg, #F0FDF4, #F0FDFA);
+      position: relative; overflow: hidden;
+    }
+    .how::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    .how-inner {
+      max-width: 1000px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center; position: relative; z-index: 1;
+    }
+    .how-tag { margin-bottom: 1rem; }
+    .how-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: var(--text); line-height: 1.1; margin-bottom: 3rem;
+    }
+    .how-title .grad {
+      background: linear-gradient(90deg, #10B981, #34D399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .steps { display: flex; flex-direction: column; }
+    .step { display: flex; gap: 1.4rem; padding-bottom: 2rem; position: relative; }
+    .step:not(:last-child)::before {
+      content: ''; position: absolute;
+      left: 18px; top: 40px; bottom: 0; width: 1.5px;
+      background: linear-gradient(to bottom, rgba(16,185,129,0.4), rgba(16,185,129,0.04));
+    }
+    .step-num {
+      flex-shrink: 0; width: 37px; height: 37px; border-radius: 50%;
+      background: var(--cyan-light); border: 1.5px solid rgba(16,185,129,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.76rem; font-weight: 900; color: var(--cyan-dark);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .step h4 { font-size: 0.97rem; font-weight: 800; color: var(--text); margin-bottom: 0.3rem; }
+    .step p  { font-size: 0.84rem; color: var(--muted); line-height: 1.6; font-weight: 500; }
+
+    /* Dashboard */
+    .dash {
+      background: white; border-radius: 24px;
+      padding: 1.8rem; box-shadow: 0 8px 40px rgba(16,185,129,0.12), 0 2px 10px rgba(15,27,45,0.06);
+      border: 1px solid var(--border);
+    }
+    .dash-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+    .dash-title { font-size: 0.76rem; font-weight: 800; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .dash-live {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.7rem; font-weight: 700; color: var(--cyan-dark);
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: ping 1.5s ease infinite; }
+
+    .d-card {
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.8rem 1rem; border-radius: 14px;
+      background: var(--light); margin-bottom: 0.6rem;
+      border: 1px solid rgba(16,185,129,0.08);
+    }
+    .d-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .d-body { flex: 1; }
+    .d-body strong { display: block; font-size: 0.83rem; color: var(--text); font-weight: 700; }
+    .d-body span   { font-size: 0.73rem; color: var(--muted); font-weight: 500; }
+    .d-status { font-size: 0.68rem; font-weight: 800; padding: 0.22rem 0.6rem; border-radius: 100px; flex-shrink: 0; }
+    .s-ok   { background: #D1FAE5; color: #065F46; }
+    .s-warn { background: #FEF3C7; color: #92400E; }
+    .s-info { background: var(--cyan-light); color: var(--cyan-dark); }
+
+    /* ═══ STATS ═══ */
+    .stats-band {
+      padding: 5rem 5%;
+      background: linear-gradient(135deg, #022C22 0%, #065F46 50%, #022C22 100%);
+      position: relative; overflow: hidden;
+    }
+    .stats-band::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(16,185,129,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .stats-band::after {
+      content: ''; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(16,185,129,0.12) 0%, transparent 70%);
+    }
+    .stats-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 2rem; text-align: center; position: relative; z-index: 1;
+    }
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3rem; font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, #10B981, #0891B2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.4rem;
+    }
+    .stat-lbl { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+    /* ═══ CONTACT ═══ */
+    .contact { padding: 7rem 5%; background: var(--white); }
+    .contact-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.1fr;
+      gap: 5rem; align-items: start;
+    }
+    .contact-left h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      line-height: 1.1; color: var(--text); margin-bottom: 1rem;
+    }
+    .contact-left h2 .grad {
+      background: linear-gradient(90deg, #10B981, #34D399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .contact-left p { color: var(--muted); line-height: 1.7; font-size: 0.97rem; font-weight: 500; margin-bottom: 2.2rem; }
+
+    .c-cards { display: flex; flex-direction: column; gap: 0.85rem; }
+    .c-card {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.3rem;
+      background: var(--light); border: 1.5px solid rgba(16,185,129,0.15);
+      border-radius: 16px; text-decoration: none; transition: all 0.25s;
+    }
+    .c-card:hover { border-color: var(--cyan); transform: translateX(4px); box-shadow: 0 4px 20px rgba(16,185,129,0.12); }
+    .c-ico { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--cyan-light); flex-shrink: 0; }
+    .c-body strong { display: block; font-size: 0.87rem; font-weight: 800; color: var(--text); }
+    .c-body span   { font-size: 0.79rem; color: var(--muted); font-weight: 500; }
+
+    .contact-form {
+      background: var(--white);
+      border: 1.5px solid rgba(16,185,129,0.2);
+      border-radius: 26px; padding: 2.5rem;
+      box-shadow: 0 8px 40px rgba(16,185,129,0.1), 0 2px 10px rgba(15,27,45,0.05);
+    }
+    .form-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+    .form-sub  { font-size: 0.84rem; color: var(--muted); font-weight: 500; margin-bottom: 1.8rem; }
+    .form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .fg { margin-bottom: 1rem; }
+    .fg label {
+      display: block; font-size: 0.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.45rem;
+    }
+    .fg input, .fg textarea, .fg select {
+      width: 100%; background: var(--light);
+      border: 1.5px solid rgba(16,185,129,0.18);
+      border-radius: 12px; padding: 0.8rem 1rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem; font-weight: 500; color: var(--text);
+      outline: none; appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .fg input:focus, .fg textarea:focus, .fg select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+      background: var(--white);
+    }
+    .fg input::placeholder, .fg textarea::placeholder { color: rgba(15,27,45,0.28); }
+    .fg select option { background: white; }
+    .fg textarea { height: 118px; resize: vertical; }
+    .form-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #10B981, #0891B2);
+      color: var(--white); border: none; border-radius: 12px;
+      padding: 1rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 24px var(--glow-cyan); margin-top: 0.5rem;
+    }
+    .form-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px var(--glow-cyan); }
+    .form-ok {
+      display: none; margin-top: 1rem;
+      background: #D1FAE5; border: 1px solid rgba(5,150,105,0.25);
+      border-radius: 12px; padding: 1rem;
+      font-size: 0.88rem; font-weight: 700; color: #065F46; text-align: center;
+    }
+
+    /* ═══ FOOTER ═══ */
+    footer {
+      background: #022C22; border-top: 1px solid rgba(16,185,129,0.1); padding: 2.8rem 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1.5rem;
+      border-top: 1px solid rgba(16,185,129,0.1);
+    }
+    .foot-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 0.5rem; }
+    .foot-logo em { font-style: normal; color: var(--cyan); }
+    .foot-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #10B981, #0891B2); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+    .foot-links { display: flex; gap: 2rem; list-style: none; }
+    .foot-links a { text-decoration: none; font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.38); transition: color 0.2s; }
+    .foot-links a:hover { color: var(--cyan); }
+    .foot-copy { font-size: 0.79rem; color: rgba(255,255,255,0.25); font-weight: 500; }
+
+    /* ═══ ANIM ═══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 1024px) {
+      .feat-grid { grid-template-columns: repeat(2, 1fr); }
+      .feat.wide { grid-column: span 1; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 2.5rem; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .how-inner { grid-template-columns: 1fr; }
+      .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+      .foot-links { justify-content: center; }
+    }
+    @media (max-width: 520px) {
+      .feat-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="logo" href="#">
+    <div class="logo-mark">🩺</div>
+    Medivine<em>Health</em>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#contact" class="nav-cta">Contact Us</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="glow-orb go-1"></div>
+  <div class="glow-orb go-2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge"><div class="badge-dot"></div> Now in Development</div>
+      <h1>Healthcare That<br/><span class="grad">Thinks Ahead</span></h1>
+      <p class="hero-desc">MedivineHealth is your all-in-one AI health companion — checking symptoms, predicting risks, finding doctors, analyzing lab reports, and building your personalized wellness routine.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">Get Early Access →</a>
+        <a href="#features" class="btn-ghost">Explore Features</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="float-chip fc-a">
+        <div class="chip-ico ic-amber">💊</div>
+        <div><span class="chip-sub">Medicine Reminder</span>Ibuprofen — 2:00 PM</div>
+      </div>
+      <div class="float-chip fc-b">
+        <div class="chip-ico ic-blue">📍</div>
+        <div><span class="chip-sub">Nearest Doctor</span>Dr. Patel — 0.8 km</div>
+      </div>
+      <div class="hero-phone">
+        <div class="phone-bar">
+          <div class="phone-logo-txt">Medivine<em>Health</em></div>
+          <div class="phone-av">🤖</div>
+        </div>
+        <div class="chat">
+          <div class="bubble b-user">I've had a headache and slight fever since yesterday.</div>
+          <div class="bubble b-ai">
+            <strong>🧠 AI Symptom Analysis</strong>
+            Likely a mild viral infection. Risk is low. Rest and stay hydrated — I'll monitor your symptoms.
+          </div>
+        </div>
+        <div class="risk-box">
+          <div class="risk-row"><span>Health Risk Level</span><span>Low — 18%</span></div>
+          <div class="risk-track"><div class="risk-fill"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="trust-row">
+    <div class="trust-item">🧠 AI-Powered Diagnostics</div>
+    <div class="trust-item">🔒 Private &amp; Secure</div>
+    <div class="trust-item">📱 Mobile First</div>
+    <div class="trust-item">⚡ Real-Time Results</div>
+    <div class="trust-item">🌍 Available Everywhere</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="sec-head reveal">
+    <div class="sec-tag">8 Powerful Features</div>
+    <h2>Everything for <span class="grad">Smarter Health</span></h2>
+    <p>One app that replaces a dozen — built with AI at its core and you at its heart.</p>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat wide reveal">
+      <div class="feat-ico ic-cyan">🧠</div>
+      <div class="feat-n">01</div>
+      <h3>AI Symptom Tracker</h3>
+      <p>Describe how you feel in plain language. Our AI listens, asks smart follow-ups, and gives you an instant, structured analysis. Track your symptoms over time and get increasingly personalized insights the more you use it.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat reveal">
+      <div class="feat-ico ic-blue">📍</div>
+      <div class="feat-n">02</div>
+      <h3>Find Local Doctors</h3>
+      <p>Locate the nearest specialists for your condition. Filter by distance, expertise and availability — and book directly from the app.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat reveal">
+      <div class="feat-ico ic-teal">🥗</div>
+      <div class="feat-n">03</div>
+      <h3>Food &amp; Fitness Guide</h3>
+      <p>Daily meal plans and adaptive workouts built around your health goals, dietary needs, and medical profile — updated as you progress.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat wide reveal">
+      <div class="feat-ico ic-indigo">🔮</div>
+      <div class="feat-n">04</div>
+      <h3>AI Disease Risk Predictor</h3>
+      <p>Using your health history, lifestyle data, and symptom patterns, our AI calculates your risk for a range of conditions — giving you the chance to act early. Get your personal risk score, trend graphs, and tailored prevention tips updated monthly.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat reveal">
+      <div class="feat-ico ic-amber">⏰</div>
+      <div class="feat-n">05</div>
+      <h3>Medicine Reminder</h3>
+      <p>Never miss a dose. Smart reminders for all your medications, adherence tracking, and refill alerts before you run out.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat reveal">
+      <div class="feat-ico ic-violet">💊</div>
+      <div class="feat-n">06</div>
+      <h3>Medicine Alternatives</h3>
+      <p>Discover safer, cheaper, or more accessible alternatives to your current medications — backed by clinical data and AI analysis.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat reveal">
+      <div class="feat-ico ic-rose">🧪</div>
+      <div class="feat-n">07</div>
+      <h3>Lab Report Analyzer</h3>
+      <p>Upload your lab results and get a plain-English breakdown of every value — what's normal, what's flagged, and what to ask your doctor.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+
+    <div class="feat reveal">
+      <div class="feat-ico ic-fuchsia">📷</div>
+      <div class="feat-n">08</div>
+      <h3>Symptom Photo Analyzer</h3>
+      <p>Photograph a visible symptom — rash, swelling, skin condition — and let our vision AI assess it and guide your next steps instantly.</p>
+      <div class="feat-arrow"><span>→</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div>
+      <div class="sec-tag how-tag reveal">How It Works</div>
+      <h2 class="how-title reveal">From symptom to solution<br/>in <span class="grad">minutes</span></h2>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">01</div>
+          <div>
+            <h4>Tell us how you feel</h4>
+            <p>Type symptoms, snap a photo, or upload a lab report. Our AI meets you wherever you are.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">02</div>
+          <div>
+            <h4>Get instant AI analysis</h4>
+            <p>A clear, structured health report with risk levels and next steps — delivered in seconds.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">03</div>
+          <div>
+            <h4>Find care if needed</h4>
+            <p>If professional help is recommended, we instantly surface the right local specialists.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">04</div>
+          <div>
+            <h4>Build long-term wellness</h4>
+            <p>Personalized nutrition, fitness, reminders, and risk tracking to help you thrive every day.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash reveal">
+      <div class="dash-hdr">
+        <div class="dash-title">Your Health Dashboard</div>
+        <div class="dash-live"><div class="live-dot"></div> Live</div>
+      </div>
+      <div class="d-card"><div class="d-ico ic-cyan">🧠</div><div class="d-body"><strong>Symptom Check</strong><span>Headache · Mild Fever — Analyzed</span></div><div class="d-status s-ok">Low Risk</div></div>
+      <div class="d-card"><div class="d-ico ic-amber">⏰</div><div class="d-body"><strong>Medication Reminder</strong><span>Vitamin D — Due in 20 min</span></div><div class="d-status s-warn">Upcoming</div></div>
+      <div class="d-card"><div class="d-ico ic-rose">🧪</div><div class="d-body"><strong>Lab Report</strong><span>Blood Panel — 2 values flagged</span></div><div class="d-status s-warn">Review</div></div>
+      <div class="d-card"><div class="d-ico ic-indigo">🔮</div><div class="d-body"><strong>Risk Predictor</strong><span>Monthly report ready</span></div><div class="d-status s-info">Updated</div></div>
+      <div class="d-card"><div class="d-ico ic-teal">🥗</div><div class="d-body"><strong>Today's Meal Plan</strong><span>3 meals · 1,840 kcal</span></div><div class="d-status s-ok">On Track</div></div>
+      <div class="d-card"><div class="d-ico ic-fuchsia">📷</div><div class="d-body"><strong>Photo Analysis</strong><span>Skin rash — Results ready</span></div><div class="d-status s-info">Reviewed</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stats-inner">
+    <div class="reveal"><div class="stat-num">8</div><div class="stat-lbl">AI-Powered Health Features</div></div>
+    <div class="reveal"><div class="stat-num">24/7</div><div class="stat-lbl">Always On — No Appointments</div></div>
+    <div class="reveal"><div class="stat-num">AI</div><div class="stat-lbl">Symptom, Vision &amp; Risk Engine</div></div>
+    <div class="reveal"><div class="stat-num">1</div><div class="stat-lbl">App for All Your Health Needs</div></div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <div class="sec-tag reveal">Get In Touch</div>
+      <h2 class="reveal">Let's Build the <span class="grad">Future of Health</span></h2>
+      <p class="reveal">Interested in early access, a partnership, or just want to say hello? We'd love to hear from you.</p>
+      <div class="c-cards reveal">
+        <a class="c-card" href="mailto:MedivineHealth@gmail.com">
+          <div class="c-ico">✉️</div>
+          <div class="c-body"><strong>Email Us</strong><span>MedivineHealth@gmail.com</span></div>
+        </a>
+        <a class="c-card" href="#">
+          <div class="c-ico">🐦</div>
+          <div class="c-body"><strong>Follow on X (Twitter)</strong><span>@MedivineHealth</span></div>
+        </a>
+        <a class="c-card" href="#">
+          <div class="c-ico">💼</div>
+          <div class="c-body"><strong>LinkedIn</strong><span>MedivineHealth</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="contact-form reveal">
+      <div class="form-title">Send a Message</div>
+      <div class="form-sub">We'll get back to you within 24 hours.</div>
+      <div class="form-row">
+        <div class="fg"><label>First Name</label><input type="text" placeholder="Jane" id="fname"/></div>
+        <div class="fg"><label>Last Name</label><input type="text" placeholder="Smith" id="lname"/></div>
+      </div>
+      <div class="fg"><label>Email Address</label><input type="email" placeholder="jane@example.com" id="email"/></div>
+      <div class="fg">
+        <label>I'm interested in…</label>
+        <select id="interest">
+          <option value="">Select an option</option>
+          <option>Early Access</option>
+          <option>Investor / Partnership</option>
+          <option>Press Inquiry</option>
+          <option>General Question</option>
+          <option>Feedback / Suggestion</option>
+        </select>
+      </div>
+      <div class="fg"><label>Message</label><textarea placeholder="Tell us what's on your mind…" id="message"></textarea></div>
+      <button class="form-btn" onclick="submitForm()">Send Message →</button>
+      <div class="form-ok" id="formOk">✅ Message sent! We'll be in touch within 24 hours.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">
+    <div class="foot-mark">🩺</div>
+    Medivine<em>Health</em>
+  </div>
+  <ul class="foot-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="foot-copy">© 2025 MedivineHealth. All rights reserved.</div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  const revEls = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 70);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  revEls.forEach(el => obs.observe(el));
+
+  function submitForm() {
+    const fname = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!fname || !email) { alert('Please fill in your name and email.'); return; }
+    const btn = document.querySelector('.form-btn');
+    btn.textContent = 'Sent ✓';
+    btn.style.background = '#059669';
+    document.getElementById('formOk').style.display = 'block';
+  }
+
+  function toggleMenu() {
+    const ul = document.querySelector('.nav-links');
+    const open = ul.dataset.open === '1';
+    if (open) { ul.style.display = 'none'; ul.dataset.open = '0'; }
+    else {
+      ul.style.cssText = 'display:flex;flex-direction:column;position:fixed;top:64px;left:0;width:100%;background:white;padding:1.5rem 5%;gap:1.2rem;border-bottom:1px solid rgba(16,185,129,0.15);z-index:199;box-shadow:0 8px 30px rgba(0,0,0,0.07);';
+      ul.dataset.open = '1';
+    }
+  }
+</script>
+</body>
+</html>
